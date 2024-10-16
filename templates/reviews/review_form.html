@@ -1,0 +1,10 @@
+<form method="post">
+    {% csrf_token %}
+    <label for="id_title">Заголовок:</label>
+    <input type="text" id="id_title" name="title"><br><br>
+    <label for="id_content">Содержание:</label>
+    <textarea id="id_content" name="content"></textarea><br><br>
+    <button type="submit">Отправить</button>
+</form>
+
+

@@ -1,0 +1,11 @@
+<h2>Список отзывов</h2>
+<ul>
+{% for review in reviews %}
+    <li><strong>{{ review.title }}</strong><br>
+    {{ review.content|truncatewords:50 }}<br>
+    Рейтинг: {{ review.rating }}<br>
+    Сентимент: {{ review.sentiment }}</li>
+{% empty %}
+    <li>Отзывов пока нет.</li>
+{% endfor %}
+</ul>

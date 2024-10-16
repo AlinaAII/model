@@ -1,0 +1,77 @@
+import os
+import tarfile
+import urllib.request
+import re
+import string
+import pickle
+
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+
+from sklearn.feature_extraction.text import HashingVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+# Загрузка набора данных
+url = 'https://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
+filename = 'aclImdb_v1.tar.gz'
+urllib.request.urlretrieve(url, filename)
+
+# Извлечение набора данных
+with tarfile.open(filename, 'r:gz') as tar:
+    tar.extractall()
+
+# Загрузка стоп-слов
+nltk.download('stopwords')
+stop_words = set(stopwords.words('english'))
+
+# Загрузка WordNetLemmatizer
+nltk.download('wordnet')
+lemmatizer = WordNetLemmatizer()
+
+def clean_text(text):
+    # Удаление специальных символов
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    # Преобразование в нижний регистр
+    text = text.lower()
+    # Удаление стоп-слов и лемматизация
+    text = ' '.join(lemmatizer.lemmatize(word) for word in text.split() if word not in stop_words)
+    return text
+
+# Чтение очищенных данных
+data = []
+labels = []
+dataset_dir = 'aclImdb'
+for dirpath, dirnames, filenames in os.walk(dataset_dir):
+    for filename in filenames:
+        filepath = os.path.join(dirpath, filename)
+        with open(filepath, 'r', encoding='utf-8') as file:
+            text = file.read()
+            cleaned_text = clean_text(text)
+            data.append(cleaned_text)
+            labels.append(os.path.basename(os.path.dirname(filepath)))
+
+# Преобразование текстовых данных в числовые признаки с использованием HashingVectorizer
+vectorizer = HashingVectorizer(n_features=2**18, alternate_sign=False)
+X = vectorizer.transform(data)
+y = labels
+
+# Разделение данных на обучающий и тестовый наборы
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Обучение модели логистической регрессии
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
+
+# Оценка производительности модели на тестовом наборе данных
+y_pred = model.predict(X_test)
+print(classification_report(y_test, y_pred))
+
+# Сохраняем модель
+with open('/mnt/c/Users/Алина/Desktop/ВТБ/Гринатом/movie_review_service/model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+# Сохранение модели в поддиректории review
+# pickle.dump(lr, open(os.path.join(os.path.dirname(__file__), 'model.pkl'), 'wb'))
