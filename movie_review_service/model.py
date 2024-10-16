@@ -19,7 +19,7 @@ def load_model():
         print(f"Произошла ошибка при загрузке модели: {str(e)}")
         raise
 
-# При сохранении модели
+
 try:
     BASE_DIR = Path(__file__).resolve().parent.parent
     MODEL_PATH = os.path.join(BASE_DIR, 'sentiment_model.joblib')

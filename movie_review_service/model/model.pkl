@@ -3,7 +3,7 @@ import tarfile
 import urllib.request
 import re
 import string
-import joblib
+import pickle
 
 import nltk
 from nltk.corpus import stopwords
@@ -70,21 +70,6 @@ y_pred = model.predict(X_test)
 print(classification_report(y_test, y_pred))
 
 # Сохранение модели
-joblib.dump(model, 'sentiment_model.joblib')
-print("Модель успешно сохранена.")
-
-# Загрузка сохраненной модели
-loaded_model = joblib.load('sentiment_model.joblib')
-
-# Проверка корректности загрузки модели
-if loaded_model == model:
-    print("Загруженная модель совпадает с исходной.")
-else:
-    print("Загруженная модель не совпадает с исходной.")
-
-# Сохраняем модель в файл model.pkl в текущей директории
-#BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-#MODEL_PATH = os.path.join(BASE_DIR, 'model.pkl')
-#with open(MODEL_PATH, 'wb') as f:
- #   pickle.dump(model, f)
+with open('/mnt/c/Users/Алина/Desktop/ВТБ/Гринатом/movie_review_service/model.pkl', 'wb') as f:
+    pickle.dump(model, f)
 

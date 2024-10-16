@@ -13,10 +13,10 @@ def create_review(request):
             review.title = form.cleaned_data['title']
             review.content = form.cleaned_data['content']
             
-            # Загружаем модель
+            
             model = load_model()
             
-            # Используем модель для определения рейтинга и sentiments
+           
             rating = predict_rating(model, review.content)
             sentiment = determine_sentiment(model, review.content)
             
@@ -32,19 +32,21 @@ from django.template.loader import render_to_string
 def review_list(request):
     reviews = Review.objects.all().order_by('-created_at')
     
-    # Используем абсолютный путь к шаблону
+    
     template_path = os.path.abspath(os.path.join(settings.BASE_DIR, 'templates', 'reviews', 'review_list.html'))
     
     return render(request, template_path, {'reviews': reviews})
 
 
 def predict_rating(model, text):
-    # Реализация предсказания рейтинга
-    # Здесь нужно использовать вашу предобученную модель
-    pass
+    probabilities = model.predict([text])
+    max_index = probabilities[0].argmax()
+    ratings = ['1', '2', '3', '4', '5']  # Например, если модель работает с рейтингами от 1 до 5
+    return ratings[max_index]
+    
 
 def determine_sentiment(model, text):
-    # Реализация определения sentiments
-    # Здесь нужно использовать вашу предобученную модель
-    pass
-
+    probabilities = model.predict([text])
+    max_index = probabilities[0].argmax()
+    sentiments = ["negative", "neutral", "positive"]
+    return sentiments[max_index]
